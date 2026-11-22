@@ -24,13 +24,15 @@ Modes: **Kryptex PPS+ (Pearl or Bitcoin payout)**, **HeroMiners / LuckyPool**, o
 - **One window dashboard.** Speed, accepted shares, temps, power, efficiency, luck, earnings estimate.
 - **Safety first.** Stops a card at its temperature limit (80 °C default).
 
-## Measured speeds (our own cards, Kryptex pool)
+## Measured speeds (miner-reported, our own cards)
 
 | Card | Speed | Power | Settings |
 |---|---|---|---|
 | RTX 5070 Ti | ~189-194 TH/s | 270 W | +175 MHz, lock 2900, 90% power |
 | RTX 5060 Ti | ~99 TH/s | 150 W | +215 MHz, lock 3000 |
 | RTX 5060 | ~84 TH/s | 145 W | +230 MHz, lock 2940 |
+
+Pool check: over a 22-hour run on the 3-card rig, Kryptex credited **289 TH/s** against **282 TH/s** reported by the miner. Short runs swing more with luck.
 
 Full results, power tests and long runs: **[BENCHMARKS.md](BENCHMARKS.md)**. Your numbers depend on card, cooling, driver and settings. Use the miner's 1-hour average or your pool's numbers to compare miners, not the first few minutes (early share counts are mostly luck).
 
