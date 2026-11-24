@@ -20,21 +20,30 @@ Modes: **Kryptex PPS+ (Pearl or Bitcoin payout)**, **HeroMiners / LuckyPool**, o
 
 - **1% fee**, lower than most Pearl miners. You mine 99 minutes, then 1 minute for the developer on the same pool. A badge shows during that minute. You keep 100% of any block you find on your own time.
 - **Card tuning built in.** Per-card clock offset, clock lock, power limit and fans, with safe limits. Every card goes back to stock when you close RulMiner. No Afterburner needed.
-- **Find my best settings.** Tests a few settings on each card (about 45 s each) and shows the fastest and the most efficient.
+- **Find my best settings.** Tests a few settings on each card (about 70 s each: a speed run, then a check that every result is still correct at that setting) and shows the fastest and the most efficient.
 - **One window dashboard.** Speed, accepted shares, temps, power, efficiency, luck, earnings estimate.
 - **Safety first.** Stops a card at its temperature limit (80 °C default).
 
-## Measured speeds (miner-reported, our own cards)
+## New in 3.1
+
+A new hand-written kernel for RTX 50-series cards: **+4.6% to +5.4% on our RTX 5070 Ti** (about +4% on our 5060 Ti / 5060 rig) at the same clock and power as 3.0 (based on llmjob's open-source sm_120 fold, MIT license). Every result is still checked against Pearl's official verifier before a share is sent. Nothing to set up: it's on by default.
+
+**What's next:** ⚡ more hashes per watt (closing the power gap to the most efficient miner) and 🧪 the FP8 version for Pearl's PIP-3 fork, which has already mined blocks accepted on Pearl's FP8 testnet.
+
+## Measured speeds (miner-reported, our own cards, RulMiner 3.1)
 
 | Card | Speed | Power | Settings |
 |---|---|---|---|
-| RTX 5070 Ti | ~189-194 TH/s | 270 W | +175 MHz, lock 2900, 90% power |
-| RTX 5060 Ti | ~99 TH/s | 150 W | +215 MHz, lock 3000 |
-| RTX 5060 | ~84 TH/s | 145 W | +230 MHz, lock 2940 |
+| RTX 5070 Ti | ~197 TH/s | 270 W | stock clocks, 270 W limit |
+| RTX 5070 Ti | ~212.5 TH/s | ~245 W | lock 3000, +499 MHz, memory 810 |
+| RTX 5060 Ti | ~110 TH/s | ~147 W | lock 3100, +400 MHz |
+| RTX 5060 | ~94.5 TH/s | 145 W | lock 3100, +400 MHz |
 
-Pool check: over a 22-hour run on the 3-card rig, Kryptex credited **289 TH/s** against **282 TH/s** reported by the miner. Short runs swing more with luck.
+The tuned rows are our own cards; offsets this high aren't safe on every chip. Start lower, or let **Find my best settings** test yours.
 
-Full results, power tests and long runs: **[BENCHMARKS.md](BENCHMARKS.md)**. Your numbers depend on card, cooling, driver and settings. Use the miner's 1-hour average or your pool's numbers to compare miners, not the first few minutes (early share counts are mostly luck).
+**Versus other miners** (RTX 5070 Ti, same clocks, back-to-back runs): RulMiner 212.5 TH/s, SRBMiner 3.8.9 213.6 TH/s, PeakMiner 2.2.08rc3 211.7 TH/s. With RulMiner's 1% fee against SRBMiner's 2%, the two come out about even, and RulMiner is level with PeakMiner. SRBMiner draws about 14 W less (6.4% more TH/s per watt). One card, short back-to-back runs; details in BENCHMARKS.md.
+
+Full results, power tests and long runs: **[BENCHMARKS.md](BENCHMARKS.md)**. Your numbers depend on card, cooling, driver and settings. Compare miners with your pool's credited hashrate over an hour or more, not the first few minutes (early share counts are mostly luck).
 
 ## FAQ
 
@@ -42,11 +51,22 @@ Full results, power tests and long runs: **[BENCHMARKS.md](BENCHMARKS.md)**. You
 
 **My antivirus flags it.** Every GPU miner gets flagged at some point because malware sometimes hides miners. Download only from this page; if you trust it, add an exclusion for the RulMiner folder.
 
-**Where are my settings?** `%LOCALAPPDATA%\RulMiner` on your PC. RulMiner only talks to the pool you pick.
+**Where are my settings?** `%LOCALAPPDATA%\RulMiner` on your PC.
+
+**What does RulMiner connect to?**
+- **The pool you pick**, to mine. LuckyPool's connection is unencrypted (its encrypted port uses a certificate Windows doesn't trust, and RulMiner never turns certificate checks off); the others use TLS.
+- **That same pool's stats page** (Kryptex, HeroMiners or LuckyPool), for the dashboard's "pool credited" numbers. It sends your wallet or account address, which that pool already has from your login. Turn it off with `RULMINER_NO_POOL_STATS=1`.
+- **The Pearl price** from Coinbase (CoinGecko as backup), every 2 minutes, for the earnings estimate. Nothing about you is sent. Turn it off with `RULMINER_NO_PRICE=1`.
+
+Nothing else: no telemetry, no update checks, no web fonts.
 
 **Does the fee connect to anything of mine?** No. During the fee minute your miner sends work to the same pool, credited to the developer's wallet address. Nothing else.
 
-**AMD / older NVIDIA?** No. RulMiner targets RTX 50-series (Blackwell) only.
+**AMD / older NVIDIA?** No. RulMiner targets RTX 50-series (Blackwell) only. On a PC with other cards too, RulMiner logs the cards it can't use and keeps mining on the rest.
+
+**Can I leave a card out?** Yes: add `set "RULMINER_EXCLUDE_GPUS=1"` (comma-separated card numbers, e.g. `1,3`) near the top of `start-rulminer.bat`. If one card stops (too hot, a wrong result, or it can't start), the other cards keep mining.
+
+**Which NVIDIA driver?** A current one (we test on 621.x). The 3.1 kernel is built with a recent CUDA toolkit; on a driver too old to load it, the card keeps mining with a built-in fallback kernel that's about 3% slower than 3.0. RulMiner's log (%LOCALAPPDATA%\RulMiner\logs) shows "rotation_fold_refused" when that happens. Updating the driver fixes it.
 
 **Pearl FP8 fork (PIP-3)?** Pearl plans a mining change (FP8). When it activates, every miner needs an update. An FP8 version of RulMiner is in testing and will ship here.
 
